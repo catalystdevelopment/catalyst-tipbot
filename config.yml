@@ -1,6 +1,7 @@
 # MongoDB connection information
 database:
   host: "127.0.0.1"
+  # look at changing this
   port: 27017
   user: ""
   password: ""
@@ -19,7 +20,7 @@ daemon:
   
 # Wrkz is 2-digit, 100
 tx_fee: 5
-min_tx_amount: 100
-max_tx_amount: 20000000
+min_tx_amount: 10000
+max_tx_amount: 100000000000
 # How many seconds between balance refresh with walletd
 wallet_balance_update_interval: 30
