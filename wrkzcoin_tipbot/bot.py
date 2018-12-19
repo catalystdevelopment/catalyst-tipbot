@@ -48,9 +48,9 @@ async def balance(context: commands.Context):
     wallet = store.get_user_wallet(user.user_id)
     await bot.send_message(
         context.message.author, '**[💰 YOUR BALANCE]**\n\n'
-        f'💰 Available: {wallet.actual_balance / CATALYST_DIGITS:.2f} '
+        f'💰 Available: {wallet.actual_balance / CATALYST_DIGITS:.7f} '
         f'{CATALYST_REPR}\n'
-        f'👛 Pending: {wallet.locked_balance / CATALYST_DIGITS:.2f} '
+        f'👛 Pending: {wallet.locked_balance / CATALYST_DIGITS:.7f} '
         f'{CATALYST_REPR}\n')
 
 
@@ -100,25 +100,25 @@ async def withdraw(context: commands.Context, amount: float):
     if real_amount + config.tx_fee >= user_balance_wallet.actual_balance:
         await bot.send_message(context.message.author,
                                f'🛑 Insufficient balance to withdraw '
-                               f'{real_amount / CATALYST_DIGITS:.2f} '
+                               f'{real_amount / CATALYST_DIGITS:.7f} '
                                f'{CATALYST_REPR}.')
         return
 
     if real_amount > config.max_tx_amount:
         await bot.reply(f'🛑 Transactions cannot be bigger than '
-                        f'{config.max_tx_amount / CATALYST_DIGITS:.2f} '
+                        f'{config.max_tx_amount / CATALYST_DIGITS:.7f} '
                         f'{CATALYST_REPR}')
         return
     elif real_amount < config.min_tx_amount:
         await bot.reply(f'🛑 Transactions cannot be lower than '
-                        f'{config.min_tx_amount / CATALYST_DIGITS:.2f} '
+                        f'{config.min_tx_amount / CATALYST_DIGITS:.7f} '
                         f'{CATALYST_REPR}')
         return
 
     withdrawal = store.withdraw(user, real_amount)
     await bot.send_message(
         context.message.author,
-        f'💰 You have withdrawn {real_amount / CATALYST_DIGITS:.2f} '
+        f'💰 You have withdrawn {real_amount / CATALYST_DIGITS:.7f} '
         f'{CATALYST_REPR}.\n'
         f'Transaction hash: `{withdrawal.tx_hash}`')
 
@@ -136,24 +136,24 @@ async def tip(context: commands.Context, member: discord.Member,
 
     if real_amount + config.tx_fee >= user_from_wallet.actual_balance:
         await bot.reply(f'🛑 Insufficient balance to send tip of '
-                        f'{real_amount / CATALYST_DIGITS:.2f} '
+                        f'{real_amount / CATALYST_DIGITS:.7f} '
                         f'{CATALYST_REPR} to {member.mention}.')
         return
 
     if real_amount > config.max_tx_amount:
         await bot.reply(f'🛑 Transactions cannot be bigger than '
-                        f'{config.max_tx_amount / CATALYST_DIGITS:.2f} '
+                        f'{config.max_tx_amount / CATALYST_DIGITS:.7f} '
                         f'{CATALYST_REPR}.')
         return
     elif real_amount < config.min_tx_amount:
         await bot.reply(f'🛑 Transactions cannot be smaller than '
-                        f'{config.min_tx_amount / CATALYST_DIGITS:.2f} '
+                        f'{config.min_tx_amount / CATALYST_DIGITS:.7f} '
                         f'{CATALYST_REPR}.')
         return
 
     tip = store.send_tip(user_from, user_to, real_amount)
 
-    await bot.reply(f'💰💖 Tip of {real_amount / CATALYST_DIGITS:.2f} '
+    await bot.reply(f'💰💖 Tip of {real_amount / CATALYST_DIGITS:.7f} '
                     f'{CATALYST_REPR} '
                     f'was sent to {member.mention}\n'
                     f'Transaction hash: `{tip.tx_hash}`')
