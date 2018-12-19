@@ -9,20 +9,20 @@ sys.path.append("..")
 import models, store, daemonrpc_client
 from config import config
 
-WRKZCOIN_DIGITS = 100
-WRKZCOIN_REPR = 'WRKZ'
+CATALYST_DIGITS = 100
+CATALYST_REPR = 'CATALYST'
 
-bot_description = f"Tip {WRKZCOIN_REPR} to other users on your server."
+bot_description = f"Tip {CATALYST_REPR} to other users on your server."
 bot_help_register = "Register or change your deposit address."
 bot_help_info = "Get your account's info."
-bot_help_withdraw = f"Withdraw {WRKZCOIN_REPR} from your balance."
-bot_help_balance = f"Check your {WRKZCOIN_REPR} balance."
-bot_help_tip = f"Give {WRKZCOIN_REPR} to a user from your balance."
-bot_help_height = f"Show {WRKZCOIN_REPR} current block height."
-bot_help_nethash = f"Show {WRKZCOIN_REPR} network hashrate."
-bot_help_diff = f"Show {WRKZCOIN_REPR} current difficulty."
-bot_help_supply = f"Show {WRKZCOIN_REPR} circulating supply."
-bot_help_stats = f"Show summary {WRKZCOIN_REPR}: height, difficulty, etc."
+bot_help_withdraw = f"Withdraw {CATALYST_REPR} from your balance."
+bot_help_balance = f"Check your {CATALYST_REPR} balance."
+bot_help_tip = f"Give {CATALYST_REPR} to a user from your balance."
+bot_help_height = f"Show {CATALYST_REPR} current block height."
+bot_help_nethash = f"Show {CATALYST_REPR} network hashrate."
+bot_help_diff = f"Show {CATALYST_REPR} current difficulty."
+bot_help_supply = f"Show {CATALYST_REPR} circulating supply."
+bot_help_stats = f"Show summary {CATALYST_REPR}: height, difficulty, etc."
 
 bot = commands.Bot(command_prefix='.')
 
@@ -48,10 +48,10 @@ async def balance(context: commands.Context):
     wallet = store.get_user_wallet(user.user_id)
     await bot.send_message(
         context.message.author, '**[💰 YOUR BALANCE]**\n\n'
-        f'💰 Available: {wallet.actual_balance / WRKZCOIN_DIGITS:.2f} '
-        f'{WRKZCOIN_REPR}\n'
-        f'👛 Pending: {wallet.locked_balance / WRKZCOIN_DIGITS:.2f} '
-        f'{WRKZCOIN_REPR}\n')
+        f'💰 Available: {wallet.actual_balance / CATALYST_DIGITS:.2f} '
+        f'{CATALYST_REPR}\n'
+        f'👛 Pending: {wallet.locked_balance / CATALYST_DIGITS:.2f} '
+        f'{CATALYST_REPR}\n')
 
 
 @bot.command(pass_context=True, help=bot_help_register)
@@ -85,7 +85,7 @@ async def register(context: commands.Context, wallet_address: str):
 async def withdraw(context: commands.Context, amount: float):
     user: models.User = models.User.objects(
         user_id=context.message.author.id).first()
-    real_amount = int(amount * WRKZCOIN_DIGITS)
+    real_amount = int(amount * CATALYST_DIGITS)
 
     if not user.user_wallet_address:
         await bot.send_message(
@@ -100,26 +100,26 @@ async def withdraw(context: commands.Context, amount: float):
     if real_amount + config.tx_fee >= user_balance_wallet.actual_balance:
         await bot.send_message(context.message.author,
                                f'🛑 Insufficient balance to withdraw '
-                               f'{real_amount / WRKZCOIN_DIGITS:.2f} '
-                               f'{WRKZCOIN_REPR}.')
+                               f'{real_amount / CATALYST_DIGITS:.2f} '
+                               f'{CATALYST_REPR}.')
         return
 
     if real_amount > config.max_tx_amount:
         await bot.reply(f'🛑 Transactions cannot be bigger than '
-                        f'{config.max_tx_amount / WRKZCOIN_DIGITS:.2f} '
-                        f'{WRKZCOIN_REPR}')
+                        f'{config.max_tx_amount / CATALYST_DIGITS:.2f} '
+                        f'{CATALYST_REPR}')
         return
     elif real_amount < config.min_tx_amount:
         await bot.reply(f'🛑 Transactions cannot be lower than '
-                        f'{config.min_tx_amount / WRKZCOIN_DIGITS:.2f} '
-                        f'{WRKZCOIN_REPR}')
+                        f'{config.min_tx_amount / CATALYST_DIGITS:.2f} '
+                        f'{CATALYST_REPR}')
         return
 
     withdrawal = store.withdraw(user, real_amount)
     await bot.send_message(
         context.message.author,
-        f'💰 You have withdrawn {real_amount / WRKZCOIN_DIGITS:.2f} '
-        f'{WRKZCOIN_REPR}.\n'
+        f'💰 You have withdrawn {real_amount / CATALYST_DIGITS:.2f} '
+        f'{CATALYST_REPR}.\n'
         f'Transaction hash: `{withdrawal.tx_hash}`')
 
 
@@ -129,32 +129,32 @@ async def tip(context: commands.Context, member: discord.Member,
     user_from: models.User = models.User.objects(
         user_id=context.message.author.id).first()
     user_to: models.User = store.register_user(member.id)
-    real_amount = int(amount * WRKZCOIN_DIGITS)
+    real_amount = int(amount * CATALYST_DIGITS)
 
     user_from_wallet: models.Wallet = models.Wallet.objects(
         wallet_address=user_from.balance_wallet_address).first()
 
     if real_amount + config.tx_fee >= user_from_wallet.actual_balance:
         await bot.reply(f'🛑 Insufficient balance to send tip of '
-                        f'{real_amount / WRKZCOIN_DIGITS:.2f} '
-                        f'{WRKZCOIN_REPR} to {member.mention}.')
+                        f'{real_amount / CATALYST_DIGITS:.2f} '
+                        f'{CATALYST_REPR} to {member.mention}.')
         return
 
     if real_amount > config.max_tx_amount:
         await bot.reply(f'🛑 Transactions cannot be bigger than '
-                        f'{config.max_tx_amount / WRKZCOIN_DIGITS:.2f} '
-                        f'{WRKZCOIN_REPR}.')
+                        f'{config.max_tx_amount / CATALYST_DIGITS:.2f} '
+                        f'{CATALYST_REPR}.')
         return
     elif real_amount < config.min_tx_amount:
         await bot.reply(f'🛑 Transactions cannot be smaller than '
-                        f'{config.min_tx_amount / WRKZCOIN_DIGITS:.2f} '
-                        f'{WRKZCOIN_REPR}.')
+                        f'{config.min_tx_amount / CATALYST_DIGITS:.2f} '
+                        f'{CATALYST_REPR}.')
         return
 
     tip = store.send_tip(user_from, user_to, real_amount)
 
-    await bot.reply(f'💰💖 Tip of {real_amount / WRKZCOIN_DIGITS:.2f} '
-                    f'{WRKZCOIN_REPR} '
+    await bot.reply(f'💰💖 Tip of {real_amount / CATALYST_DIGITS:.2f} '
+                    f'{CATALYST_REPR} '
                     f'was sent to {member.mention}\n'
                     f'Transaction hash: `{tip.tx_hash}`')
 
@@ -177,7 +177,7 @@ async def diff(context: commands.Context):
 @bot.command(pass_context=True, help=bot_help_supply)
 async def supply(context: commands.Context):
     supply = daemonrpc_client.getsupply()
-    await bot.reply(f'*[CIRCULATING SUPPLY]* `{supply}{WRKZCOIN_REPR}`\n')
+    await bot.reply(f'*[CIRCULATING SUPPLY]* `{supply}{CATALYST_REPR}`\n')
 
 @bot.command(pass_context=True, help=bot_help_stats)
 async def stats(context: commands.Context):
@@ -186,7 +186,7 @@ async def stats(context: commands.Context):
     hashrate = daemonrpc_client.gethashrate()
     height = daemonrpc_client.getheight()
     await bot.reply(f'\n*[NETWORK HEIGHT]* `{height}`\n'
-                    f'*[CIRCULATING SUPPLY]* `{supply}{WRKZCOIN_REPR}`\n'
+                    f'*[CIRCULATING SUPPLY]* `{supply}{CATALYST_REPR}`\n'
                     f'*[CURRENT DIFFICULTY]* `{difficulty}`\n'
                     f'*[NETWORK HASH RATE]* `{hashrate}`\n')
 
