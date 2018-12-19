@@ -4,7 +4,7 @@ database:
   port: 27017
   user: ""
   password: ""
-  db: "wrkz_tipbot"
+  db: "catalyst_tipbot"
 # Discord Bot user token
 discord:
   token: ""
@@ -15,7 +15,7 @@ wallet:
 # daemon rpc connection information
 daemon:
   host: "127.0.0.1"
-  port: "17856"
+  port: "17291"
   
 # Wrkz is 2-digit, 100
 tx_fee: 5
