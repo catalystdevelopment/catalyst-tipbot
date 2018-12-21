@@ -9,7 +9,7 @@ sys.path.append("..")
 import models, store, daemonrpc_client
 from config import config
 
-CATALYST_DIGITS = 100
+CATALYST_DIGITS = 10000000
 CATALYST_REPR = 'CATALYST'
 
 bot_description = f"Tip {CATALYST_REPR} to other users on your server."
