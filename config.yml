@@ -18,7 +18,7 @@ daemon:
   host: "127.0.0.1"
   port: "17291"
   
-# Wrkz is 2-digit, 100
+# Catalyst is 7-digit, 10000000
 tx_fee: 5
 min_tx_amount: 10000
 max_tx_amount: 100000000000
