@@ -40,7 +40,7 @@ Based on original code: https://github.com/MarcDufresne/m0rkcoin-tip-bot
 * `cd wrkzcoin-tipbot`
 * `pip3.6 install tox pipenv click discord mongoengine yapf futures pyyaml munch requests`
 * Run wrkz-service with existing wallet or new wallet and Wrkzd and note your defined ports.
-* service example `./catalyst-service -w cat2.wallet -p <walletpassword> --rpc-password <rpc_password>  <walletpassword>`
+* service example `./catalyst-service -w <wallet_file.wallet> -p <walletpassword> --rpc-password <rpc_password>  <walletpassword>`
 * Edit `config.yml`
 * Inside wrkztip-tipbot: `tox -r --notest`
 * Finally run tipbot: `/usr/local/bin/python3.6m /PATH/TO/wrkzcoin_tipbot/bot.py`
