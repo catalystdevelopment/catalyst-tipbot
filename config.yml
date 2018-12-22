@@ -1,7 +1,6 @@
 # MongoDB connection information
 database:
   host: "127.0.0.1"
-  # look at changing this
   port: 27017
   user: ""
   password: ""
