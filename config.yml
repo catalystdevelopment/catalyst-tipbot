@@ -11,7 +11,7 @@ discord:
 # walletd connection information
 wallet:
   host: "127.0.0.1"
-  port: "1111"
+  port: "17280"
 # daemon rpc connection information
 daemon:
   host: "127.0.0.1"
