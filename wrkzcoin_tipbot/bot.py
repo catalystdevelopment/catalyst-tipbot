@@ -219,7 +219,7 @@ async def handle_errors(error):
     if isinstance(error, commands.BadArgument):
         await bot.say(f'Invalid arguments provided.')
     else:
-        await bot.say(f'Error.')
+        await bot.say(error)
 
 
 async def update_balance_wallets():

@@ -12,6 +12,7 @@ discord:
 wallet:
   host: "127.0.0.1"
   port: "17280"
+  password: ""
 # daemon rpc connection information
 daemon:
   host: "127.0.0.1"
