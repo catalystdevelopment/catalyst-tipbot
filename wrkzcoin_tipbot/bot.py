@@ -2,6 +2,7 @@ import asyncio
 import click
 import discord
 import mongoengine
+import re
 from discord.ext import commands
 from discord.utils import get
 
@@ -27,7 +28,7 @@ bot_help_supply = f"Show {COIN_REPR} circulating supply."
 bot_help_stats = f"Show summary {COIN_REPR}: height, difficulty, etc."
 
 bot = commands.Bot(command_prefix='.')
-#   Consider removing, EMOJI variables, use this instead:
+#   Consider removing, EMOJI unicode strings, use this instead:
 #   emoji = get(bot.get_all_emojis(), name='catalyst_icon_circle')
 #   await bot.add_reaction(context.message, emoji)
 # unicode
@@ -35,6 +36,7 @@ bot = commands.Bot(command_prefix='.')
 EMOJI_ERROR = get(bot.get_all_emojis(), name='x')
 # EMOJI_CHECKMARK = "\u2713"
 EMOJI_CHECKMARK = get(bot.get_all_emojis(), name='white_check_mark')
+
 EMOJI_MONEYFACE = "\u1F911"
 
 @bot.event
