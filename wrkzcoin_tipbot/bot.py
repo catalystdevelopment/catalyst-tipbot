@@ -3,6 +3,7 @@ import click
 import discord
 import mongoengine
 from discord.ext import commands
+from discord.utils import get
 
 import sys
 sys.path.append("..")
@@ -26,7 +27,14 @@ bot_help_supply = f"Show {COIN_REPR} circulating supply."
 bot_help_stats = f"Show summary {COIN_REPR}: height, difficulty, etc."
 
 bot = commands.Bot(command_prefix='.')
-EMOJI_ERROR = "\u774C"
+#   Consider removing, EMOJI variables, use this instead:
+#   emoji = get(bot.get_all_emojis(), name='catalyst_icon_circle')
+#   await bot.add_reaction(context.message, emoji)
+# unicode
+# EMOJI_ERROR = "\u774C"
+EMOJI_ERROR = get(bot.get_all_emojis(), name='x')
+# EMOJI_CHECKMARK = "\u2713"
+EMOJI_CHECKMARK = get(bot.get_all_emojis(), name='white_check_mark')
 EMOJI_MONEYFACE = "\u1F911"
 
 @bot.event
@@ -81,6 +89,11 @@ async def botbalance(context: commands.Context, member: discord.Member):
             f'👛 Pending: {balance_locked} '
             f'{COIN_REPR}\n')
 
+
+# New bot, gets following error when enter .register command
+# Command raised an exception: NameError: name 're' is not defined
+#  Using old code till this get settled.
+
 @bot.command(pass_context=True, name='register', aliases=['registerwallet', 'reg', 'updatewallet'], help=bot_help_register)
 async def register(context: commands.Context, wallet_address: str):
     user_id = context.message.author.id
@@ -104,7 +117,7 @@ async def register(context: commands.Context, wallet_address: str):
         existing_user = store.register_user(existing_user.user_id,
                                             user_wallet=wallet_address)
         if prev_address:
-            await bot.add_reaction(context.message, EMOJI_MONEYFACE)
+            await bot.add_reaction(context.message, EMOJI_CHECKMARK)
             await bot.send_message(
                 context.message.author,
                 f'Your deposit address has been changed from:\n'
@@ -114,12 +127,41 @@ async def register(context: commands.Context, wallet_address: str):
 
     user = (existing_user or
             store.register_user(user_id, user_wallet=wallet_address))
-    await bot.add_reaction(context.message, EMOJI_MONEYFACE)
+    await bot.add_reaction(context.message, EMOJI_CHECKMARK)
     await bot.send_message(context.message.author,
                            f'You have been registered.\n'
                            f'You can send your deposits to '
                            f'`{user.balance_wallet_address}` and your '
                            f'balance will be available once confirmed.')
+
+
+# old discord bot .register command
+
+# @bot.command(pass_context=True, help=bot_help_register)
+# async def register(context: commands.Context, wallet_address: str):
+#     user_id = context.message.author.id
+
+#     existing_user: models.User = models.User.objects(user_id=user_id).first()
+#     if existing_user:
+#         prev_address = existing_user.user_wallet_address
+#         existing_user = store.register_user(existing_user.user_id,
+#                                             user_wallet=wallet_address)
+#         if prev_address:
+#             await bot.send_message(
+#                 context.message.author,
+#                 f'Your deposit address has been changed from:\n'
+#                 f'`{prev_address}`\n to\n '
+#                 f'`{existing_user.user_wallet_address}`')
+#             return
+
+#     user = (existing_user or
+#             store.register_user(user_id, user_wallet=wallet_address))
+
+#     await bot.send_message(context.message.author,
+#                            f'You have been registered.\n'
+#                            f'You can send your deposits to '
+#                            f'`{user.balance_wallet_address}` and your '
+#                            f'balance will be available once confirmed.')
 
 
 @bot.command(pass_context=True, help=bot_help_withdraw)
@@ -165,7 +207,7 @@ async def withdraw(context: commands.Context, amount: float):
 
     withdrawal = store.withdraw(user, real_amount)
     if (withdrawal is not None):
-        await bot.add_reaction(context.message, EMOJI_MONEYFACE)
+        await bot.add_reaction(context.message, EMOJI_CHECKMARK)
         await bot.send_message(
             context.message.author,
                 f'💰 You have withdrawn {real_amount / COIN_DIGITS:.7f} '
@@ -221,7 +263,8 @@ async def tip(context: commands.Context, amount: float,
     tip = store.send_tip(user_from, user_to, real_amount)
     if (tip is not None):
         tipAmount = '{:,.7f}'.format(real_amount / COIN_DIGITS)
-        await bot.add_reaction(context.message, EMOJI_MONEYFACE)
+        emoji = get(bot.get_all_emojis(), name='catalyst_icon_circle')
+        await bot.add_reaction(context.message, emoji)
         await bot.send_message(
             context.message.author,
                         f'💰💖 Tip of {tipAmount} '
@@ -240,20 +283,24 @@ async def height(context: commands.Context):
     height = daemonrpc_client.getheight()
     await bot.reply(f'*[NETWORK HEIGHT]* `{height}`\n')
 
+
 @bot.command(pass_context=True, help=bot_help_nethash)
 async def hash(context: commands.Context):
     hashrate = daemonrpc_client.gethashrate()
     await bot.reply(f'*[NETWORK HASH RATE]* `{hashrate}`\n')
+
 
 @bot.command(pass_context=True, help=bot_help_diff)
 async def diff(context: commands.Context):
     difficulty = daemonrpc_client.getdiff()
     await bot.reply(f'*[CURRENT DIFFICULTY]* `{difficulty}`\n')
 
+
 @bot.command(pass_context=True, help=bot_help_supply)
 async def supply(context: commands.Context):
     supply = daemonrpc_client.getsupply()
     await bot.reply(f'*[CIRCULATING SUPPLY]* `{supply}{COIN_REPR}`\n')
+
 
 @bot.command(pass_context=True, help=bot_help_stats)
 async def stats(context: commands.Context):
@@ -266,39 +313,36 @@ async def stats(context: commands.Context):
                     f'*[CURRENT DIFFICULTY]* `{difficulty}`\n'
                     f'*[NETWORK HASH RATE]* `{hashrate}`\n')
 
+
 @register.error
 async def register_error(error, _: commands.Context):
-    pass
-
+    await handle_errors(error)
 
 @info.error
 async def info_error(error, _: commands.Context):
-    pass
+    await handle_errors(error)
 
 @balance.error
 async def botbalance_error(error, _: commands.Context):
-    pass
+    await handle_errors(error)
 
 @balance.error
 async def balance_error(error, _: commands.Context):
-    pass
-
+    await handle_errors(error)
 
 @withdraw.error
 async def withdraw_error(error, _: commands.Context):
-    pass
-
+    await handle_errors(error)
 
 @tip.error
 async def tip_error(error, _: commands.Context):
-    pass
-
+    await handle_errors(error)
 
 async def handle_errors(error):
     if isinstance(error, commands.BadArgument):
         await bot.say(f'Invalid arguments provided.')
     else:
-        await bot.say(f'Error.')
+        await bot.say(error)
 
 
 async def update_balance_wallets():
@@ -398,7 +442,8 @@ async def _tip(context: commands.Context, amount,
     #print(destinations)
     tip = store.send_tipall(user_from, destinations, real_amount)
 
-    await bot.add_reaction(context.message, EMOJI_MONEYFACE)
+    emoji = get(bot.get_all_emojis(), name='catalyst_icon_circle')
+    await bot.add_reaction(context.message, emoji)
     await bot.send_message(
         context.message.author,
                     f'💰💖 Total tip of {ActualSpend / COIN_DIGITS:.7f} '
